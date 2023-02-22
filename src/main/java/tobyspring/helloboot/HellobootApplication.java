@@ -15,6 +15,7 @@ import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -34,17 +35,26 @@ public class HellobootApplication {
 
 		WebServer webServer = serverFactory.getWebServer(servletContext -> {
 			//servlet container에 servlet을 등록, 매핑
-			servletContext.addServlet("hello", new HttpServlet() {
+			//서블릿을 프론트컨트롤러 하나만 두고 공통처리인 인증,보안,다국어 처리등을 담당
+			servletContext.addServlet("frontController", new HttpServlet() {
 				@Override
 				protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-					String name = req.getParameter("name");
+					//공통처리 로직
 
-					resp.setStatus(HttpStatus.OK.value());
-					resp.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
-					resp.getWriter().println("Hello Servlet" + name);
+					//공통처리 로직
+					if (req.getRequestURI().equals("/hello") && req.getMethod().equals(HttpMethod.GET.name())) {
+						String name = req.getParameter("name");
+						resp.setStatus(HttpStatus.OK.value());
+						resp.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
+						resp.getWriter().println("Hello Servlet" + name);
+					} else if (req.getRequestURI().equals("/user")) {
+						//
+					} else {
+						resp.setStatus(HttpStatus.NOT_FOUND.value());
+					}
 
 				}
-			}).addMapping("/hello");
+			}).addMapping("/*");
 		});
 
 		webServer.start();	//tomcat servlet container가 실행
