@@ -34,19 +34,26 @@ public class HellobootApplication {
 		//ServletWebServerFactory jettyServletWebServerFactory = new JettyServletWebServerFactory();
 
 		WebServer webServer = serverFactory.getWebServer(servletContext -> {
+			HelloController helloController = new HelloController();
+
 			//servlet container에 servlet을 등록, 매핑
 			//서블릿을 프론트컨트롤러 하나만 두고 공통처리인 인증,보안,다국어 처리등을 담당
 			servletContext.addServlet("frontController", new HttpServlet() {
 				@Override
 				protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 					//공통처리 로직
-
+					//...
 					//공통처리 로직
-					if (req.getRequestURI().equals("/hello") && req.getMethod().equals(HttpMethod.GET.name())) {
-						String name = req.getParameter("name");
+
+					if (req.getRequestURI().equals("/hello") && req.getMethod().equals(HttpMethod.GET.name())) {	//Mapping
+						String name = req.getParameter("name");	//파라미터 추출, 바인딩
+
+						String ret = helloController.hello(name);
+
+						//응답
 						resp.setStatus(HttpStatus.OK.value());
 						resp.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
-						resp.getWriter().println("Hello Servlet" + name);
+						resp.getWriter().println(ret);
 					} else if (req.getRequestURI().equals("/user")) {
 						//
 					} else {
