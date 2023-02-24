@@ -3,6 +3,7 @@ package tobyspring.helloboot;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -17,23 +18,28 @@ import org.springframework.web.servlet.DispatcherServlet;
 @Configuration
 @ComponentScan
 public class HellobootApplication {
+	@Bean
+	public ServletWebServerFactory servletWebServerFactory() {
+		return new TomcatServletWebServerFactory();
+	}
+
+	@Bean
+	public DispatcherServlet dispatcherServlet() {
+		return new DispatcherServlet();
+	}
+
 	public static void main(String[] args) {
 		//Spring Container
 		AnnotationConfigWebApplicationContext applicationContext = new AnnotationConfigWebApplicationContext() {
 			@Override
 			protected void onRefresh() {
 				super.onRefresh();
-				//추상화
-				ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
-				//ServletWebServerFactory jettyServletWebServerFactory = new JettyServletWebServerFactory();
 
-				WebServer webServer = serverFactory.getWebServer(servletContext -> {
-					//servlet container에 servlet을 등록, 매핑
-					//서블릿을 프론트컨트롤러 하나만 두고 공통처리인 인증,보안,다국어 처리등을 담당
-					servletContext.addServlet("dispatcherServlet",
-						new DispatcherServlet(this)    //WebApplicationContext를 사용
-					).addMapping("/*");
-				});
+				ServletWebServerFactory serverFactory = this.getBean(ServletWebServerFactory.class);
+				DispatcherServlet dispatcherServlet = this.getBean(DispatcherServlet.class);
+
+				WebServer webServer = serverFactory.getWebServer(servletContext -> servletContext.addServlet("dispatcherServlet", dispatcherServlet).addMapping("/*"));
+
 				webServer.start();    //tomcat servlet container가 실행
 			}
 		};
