@@ -26,6 +26,7 @@ public class HellobootApplication {
 		//Spring Container
 		GenericApplicationContext applicationContext = new GenericApplicationContext();
 		applicationContext.registerBean(HelloController.class);
+		applicationContext.registerBean(SimpleHelloService.class);
 		applicationContext.refresh();	//bean object 생성
 
 		//추상화

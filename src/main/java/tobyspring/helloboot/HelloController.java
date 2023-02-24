@@ -6,9 +6,13 @@ import java.util.Objects;
 	Contoller의 역할은 검증
  */
 public class HelloController {
-	public String hello(String name) {
-		SimpleHelloService helloService = new SimpleHelloService();
+	private final HelloService helloService;
 
+	public HelloController(HelloService helloService) {
+		this.helloService = helloService;
+	}
+
+	public String hello(String name) {
 		return helloService.sayHello(Objects.requireNonNull(name));
 	}
 }
