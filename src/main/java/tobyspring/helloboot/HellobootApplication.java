@@ -16,22 +16,29 @@ public class HellobootApplication {
 
 	public static void main(String[] args) {
 		//Spring Container
-		GenericWebApplicationContext applicationContext = new GenericWebApplicationContext();
+		//기존 GenericWebApplicationContext을 확장하여 onRefresh 메소드 오버라이딩
+		GenericWebApplicationContext applicationContext = new GenericWebApplicationContext(){
+			@Override
+			protected void onRefresh() {
+				super.onRefresh();
+				//추상화
+				ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
+				//ServletWebServerFactory jettyServletWebServerFactory = new JettyServletWebServerFactory();
+
+				WebServer webServer = serverFactory.getWebServer(servletContext -> {
+					//servlet container에 servlet을 등록, 매핑
+					//서블릿을 프론트컨트롤러 하나만 두고 공통처리인 인증,보안,다국어 처리등을 담당
+					servletContext.addServlet("dispatcherServlet",
+						new DispatcherServlet(this)	//WebApplicationContext를 사용
+					).addMapping("/*");
+				});
+				webServer.start();    //tomcat servlet container가 실행
+			}
+		};
 		applicationContext.registerBean(HelloController.class);
 		applicationContext.registerBean(SimpleHelloService.class);
-		applicationContext.refresh();    //bean object 생성
+		applicationContext.refresh();    //bean object 생성, templateMethod
 
-		//추상화
-		ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
-		//ServletWebServerFactory jettyServletWebServerFactory = new JettyServletWebServerFactory();
 
-		WebServer webServer = serverFactory.getWebServer(servletContext -> {
-			//servlet container에 servlet을 등록, 매핑
-			//서블릿을 프론트컨트롤러 하나만 두고 공통처리인 인증,보안,다국어 처리등을 담당
-			servletContext.addServlet("dispatcherServlet",
-				new DispatcherServlet(applicationContext)	//WebApplicationContext를 사용
-			).addMapping("/*");
-		});
-		webServer.start();    //tomcat servlet container가 실행
 	}
 }
