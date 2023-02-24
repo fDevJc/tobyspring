@@ -28,7 +28,6 @@ public class HellobootApplication {
 
 	public static void main(String[] args) {
 		//Spring Container
-		//기존 GenericWebApplicationContext을 확장하여 onRefresh 메소드 오버라이딩
 		AnnotationConfigWebApplicationContext applicationContext = new AnnotationConfigWebApplicationContext() {
 			@Override
 			protected void onRefresh() {
