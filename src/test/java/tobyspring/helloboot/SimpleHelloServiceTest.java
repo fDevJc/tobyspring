@@ -25,9 +25,23 @@ import org.junit.jupiter.api.Test;
 }
 
 class SimpleHelloServiceTest {
+
+	private static HelloRepository helloRepositoryStub = new HelloRepository() {
+		@Override
+		public Hello findMember(String name) {
+			return null;
+		}
+
+		@Override
+		public void increaseCount(String name) {
+
+		}
+	};
+
 	@FastUnitTest
 	void hello() throws Exception {
-		SimpleHelloService simpleHelloService = new SimpleHelloService();
+		SimpleHelloService simpleHelloService = new SimpleHelloService(helloRepositoryStub);
+
 		String ret = simpleHelloService.sayHello("Test");
 
 		assertThat(ret).isEqualTo("Hello Test");
@@ -35,7 +49,17 @@ class SimpleHelloServiceTest {
 
 	@Test
 	void helloDecorator() throws Exception {
-		HelloDecorator helloDecorator = new HelloDecorator(name -> name);
+		HelloDecorator helloDecorator = new HelloDecorator(new HelloService() {
+			@Override
+			public String sayHello(String name) {
+				return name;
+			}
+
+			@Override
+			public int countOf(String name) {
+				return 0;
+			}
+		});
 		String ret = helloDecorator.sayHello("Test");
 		Assertions.assertThat(ret).isEqualTo("*Test*");
 	}

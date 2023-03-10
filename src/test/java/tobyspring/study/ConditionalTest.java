@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -27,10 +28,11 @@ public class ConditionalTest {
 		MyBean bean = ac.getBean(MyBean.class);
 
 		AnnotationConfigApplicationContext ac2 = new AnnotationConfigApplicationContext();
-		ac2.register(Config2.class);
+		ac2.register(Config2.class);	//@BooleanConditional(false)
 		ac2.refresh();
 
-		MyBean bean2 = ac2.getBean(MyBean.class);
+		org.junit.jupiter.api.Assertions.assertThrows(NoSuchBeanDefinitionException.class,
+			() -> ac2.getBean(MyBean.class));
 	}
 
 	@Test

@@ -1,12 +1,12 @@
 package tobyspring.helloboot;
 
 public interface HelloRepository {
-	Member findMember(String name);
+	Hello findMember(String name);
 
 	void increaseCount(String name);
 
 	default int countOf(String name) {
-		Member member = findMember(name);
-		return member == null ? 0 : member.getCount();
+		Hello hello = findMember(name);
+		return hello == null ? 0 : hello.getCount();
 	}
 }
