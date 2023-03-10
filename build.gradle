@@ -10,10 +10,20 @@ sourceCompatibility = '11'
 
 repositories {
 	mavenCentral()
+	maven {
+		url 'https://repo.clojars.org'
+		name 'Clojars'
+	}
 }
 
 dependencies {
 	implementation ('org.springframework.boot:spring-boot-starter-web')
+	implementation ('org.springframework:spring-jdbc')	//보통 starter로 패키징된 라이브러리를 가져오지만 실습에서는 따로
+
+	// https://mvnrepository.com/artifact/hikari-cp/hikari-cp
+	implementation 'hikari-cp:hikari-cp:3.0.1'
+
+	runtimeOnly ('com.h2database:h2:2.1.214')
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
